@@ -1,0 +1,953 @@
+% John Peloquin
+% Exercises from Theory of Recursive Functions and Effective Computability
+\documentclass[letterpaper]{article}
+\usepackage{amsmath,amssymb,amsthm,enumitem,fourier}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathcal{C}}
+\renewcommand{\P}{\mathcal{P}}
+\newcommand{\T}{\mathcal{T}}
+
+\newcommand{\union}{\cup}
+\newcommand{\sect}{\cap}
+\newcommand{\iso}{\equiv}
+
+\newcommand{\dom}{\mathrm{domain}}
+\newcommand{\ran}{\mathrm{range}}
+\newcommand{\comp}[1]{\overline{#1}}
+\newcommand{\card}[1]{|{#1}|}
+\newcommand{\pair}[2]{\langle{#1},{#2}\rangle}
+
+\newcommand{\smn}{$s$-$m$-$n$}
+
+\theoremstyle{definition}
+\newtheorem*{defn}{Definition}
+\newtheorem*{exer}{Exercise}
+
+\theoremstyle{remark}
+\newtheorem*{rmk}{Remark}
+
+\newtheoremstyle{direction}{0.5em}{0.5em}{}{}{}{}{0.5em}{}
+\theoremstyle{direction}
+\newtheorem*{fwd}{$\implies$}
+\newtheorem*{bwd}{$\impliedby$}
+
+\title{Exercises from \emph{Recursive Functions}}
+\author{John Peloquin}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Chapter~2}
+
+\subsection*{Exercises}
+\begin{defn}
+$K=\{\,x\mid\varphi_x(x)\text{ converges}\,\}$.
+\end{defn}
+
+\begin{exer}[2-1]
+For $k\ge0$, the function
+$$g(x)=
+\begin{cases}
+1&\text{if }x\le k\\
+0&\text{if }x>k
+\end{cases}$$
+is primitive recursive.
+\end{exer}
+\begin{proof}
+Note the following functions are primitive recursive:
+\begin{description}[itemsep=0pt]
+\item[Predecessor (truncated)] $p(x)=\lambda x[\max(0,x-1)]$
+\item[Difference (truncated)] $d(x,y)=\lambda xy[\max(0,x-y)]$
+\item[Signal] $s(x)=\lambda xy[\min(x,1)]$
+\end{description}
+Indeed, note $p(0)=0$ and $p(x+1)=x$; $d(x,0)=x$ and $d(x,y+1)=p(d(x,y))$; and $s(x)=d(x,p(x))$. Now $g(x)=s(d(k+1,x))$ since $x\le k$ iff $0<(k+1)-x$.
+\end{proof}
+
+\begin{exer}[2-2]
+The function
+$$f(x)=
+\begin{cases}
+1&\text{if }\varphi_x(x)=1\\
+0&\text{otherwise}
+\end{cases}$$
+is not recursive.
+\end{exer}
+\begin{proof}
+If so, then $g=\lambda x[1-f(x)]$ is also recursive, say $g=\varphi_k$. But then
+$$\varphi_k(k)=1\iff g(k)=1\iff f(k)=0\iff\varphi_k(k)\ne 1$$
+---a contradiction.
+\end{proof}
+
+\begin{exer}[2-3]
+Fix an effective enumeration of primitive recursive functions and let $f_x$ denote the $(x+1)$-th function. Then
+$$g=\lambda xy[f_x(y)]$$
+is recursive but not primitive recursive.
+\end{exer}
+\begin{proof}
+By Church's Thesis, there is a recursive~$s$ such that $f_x=\varphi_{s(x)}$ for all~$x$. Now if $u$~is an index of the universal function for unary recursive functions, then
+$$g=\lambda xy[\varphi_{s(x)}(y)]=\lambda xy[\varphi_u^{(2)}(s(x),y)]$$
+so $g$~is recursive.
+
+If $g$~is primitive recursive, then so is $h=\lambda x[g(x,x)+1]$. But then $h(x)=f_x(x)+1$ for all~$x$, so $h\ne f_x$ for all~$x$---a contradiction.
+\end{proof}
+
+\begin{exer}[2-8]
+There is no recursive function~$f(z,x)$ such that
+$$P_z(x)\text{ halts}\iff P_z(x)\text{ halts in at most }f(z,x)\text{ steps}$$
+\end{exer}
+\begin{proof}
+By Church's Thesis,
+$$s(z,x,y)=
+\begin{cases}
+1&\text{if }P_z(x)\text{ halts in at most }y\text{ steps}\\
+0&\text{otherwise}
+\end{cases}$$
+is recursive. If $f$~exists, then $h(z,x)=s(z,x,f(z,x))$ is recursive, but
+$$h(z,x)=
+\begin{cases}
+1&\text{if }P_z(x)\text{ halts}\\
+0&\text{otherwise}
+\end{cases}$$
+---contradicting the halting problem.
+\end{proof}
+
+\begin{exer}[2-9]
+There is no recursive function~$f$ with $\ran(f)=\{\,x\mid\varphi_x\text{ is total}\,\}$.
+\end{exer}
+\begin{proof}
+If so, set $g=\lambda x[\varphi_{f(x)}(x)+1]$. Then $g$~is recursive, say $g=\varphi_k$, but
+$$g(k)=\varphi_{f(k)}(k)+1=g(k)+1$$
+---a contradiction.
+\end{proof}
+
+\begin{exer}[2-10]
+Let $\P$~denote the class of unary partial recursive functions. Call a surjective map $\pi:\N\to\P$ a \emph{numbering} of~$\P$. Let $\pi_0:\N\to\P$ denote the numbering induced by our effective coding of programs, and call a numbering~$\pi$ \emph{acceptable} if the following conditions hold:
+\begin{description}[itemsep=0pt]
+\item[(A1)] There is a recursive function~$f$ such that $\pi=\pi_0f$.
+\item[(A2)] There is a recursive function~$g$ such that $\pi_0=\pi g$.
+\end{description}
+Let $\varphi_{x,\pi}$~denote~$\pi(x)$, with $\varphi_x=\varphi_{x,\pi_0}$ as usual. Then:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Any effective enumeration of programs induces an acceptable numbering.
+\item[(b)] (A1)~is equivalent to the unary enumeration theorem for~$\pi$, that is, (A1)~holds iff the following holds:
+\begin{quote}
+There exists a partial recursive function~$\chi(k,x)$ such that for all~$k$, $\varphi_{k,\pi}=\lambda x[\chi(k,x)]$.
+\end{quote}
+\item[(c)] (A2)~is equivalent to the unary \smn\ theorem for~$\pi$, that is, (A2)~holds iff the following holds:
+\begin{quote}
+For all partial recursive functions~$\psi(x,y)$, there exists a recursive function~$s$ such that for all~$x$, $\varphi_{s(x),\pi}=\lambda y[\psi(x,y)]$.
+\end{quote}
+\item[(d)] (A2)~implies that $\pi^{-1}(\psi)$~is infinite for all $\psi\in\P$.
+\end{enumerate}
+\end{exer}
+\begin{proof}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Immediate by Church's Thesis. Let $\pi(x)$~be the function computed by the $(x+1)$-th program in the enumeration; let $f(x)$~find the $(x+1)$-th program in the enumeration and return its code; and let $g(x)$~find the program in the enumeration coded by~$x$ and return $k-1$ where $k$~is its position.
+
+\item[(b)]
+\begin{fwd}
+Pull back the enumeration theorem from~$\pi_0$ to~$\pi$ using~$f$.
+
+Let $\psi$~be universal for~$\pi_0$. Then for all~$k$,
+$$\varphi_{f(k)}=\lambda x[\psi(f(k),x)]$$
+Set $\chi(k,x)=\psi(f(k),x)$. Since $\pi=\pi_0f$, $\varphi_{k,\pi}=\varphi_{f(k)}$ for all~$k$. So
+$$\varphi_{k,\pi}=\lambda x[\chi(k,x)]$$
+for all~$k$, that is, $\chi$~is universal for~$\pi$.
+\end{fwd}
+\begin{bwd}
+Invert the enumeration theorem for~$\pi$ using the \smn\ theorem for~$\pi_0$.
+
+Given~$\chi$ universal for~$\pi$, define~$f$ using the \smn\ theorem for~$\pi_0$ such that
+$$\varphi_{f(k)}=\lambda x[\chi(k,x)]$$
+for all~$k$. Then $\varphi_{k,\pi}=\varphi_{f(k)}$ for all~$k$, so $\pi=\pi_0f$.
+\end{bwd}
+
+\item[(c)]
+\begin{fwd}
+Push forward the \smn\ theorem from~$\pi_0$ to~$\pi$ using~$g$.
+
+Given~$\psi(x,y)$, choose~$r$ by the \smn\ theorem for~$\pi_0$ such that
+$$\varphi_{r(x)}=\lambda y[\psi(x,y)]$$
+for all~$x$. Since $\pi_0=\pi g$, $\varphi_{r(x)}=\varphi_{g(r(x)),\pi}=\varphi_{(g\circ r)(x),\pi}$ for all~$x$, so $s=g\circ r$ works.
+\end{fwd}
+\begin{bwd}
+Invert the \smn\ theorem for~$\pi$ using the enumeration theorem for~$\pi_0$.
+
+Let $\psi$~be universal for~$\pi_0$. Choose~$g$ by the \smn\ theorem for~$\pi$ such that
+$$\varphi_{g(x),\pi}=\lambda y[\psi(x,y)]=\varphi_x$$
+for all~$x$. Then $\pi_0=\pi g$.
+\end{bwd}
+
+\item[(d)]
+If not, choose $\psi\in\P$ with $\pi^{-1}(\psi)\supseteq g(\pi_0^{-1}(\psi))$ finite. Then it is possible to decide for any~$x$ if $\varphi_x=\psi$ by computing~$g(x)$ and deciding if $g(x)\in\pi^{-1}(\psi)$---a contradiction.\qedhere
+\end{enumerate}
+\end{proof}
+\begin{rmk}
+This exercise shows invariance of the enumeration and \smn\ theorems under acceptable numberings. Intuitively, this means the details of our particular numbering do not matter so long as we can effectively go back and forth between numbers and programs---that is, code can be effectively identified with data.
+
+Intuitively, (A1)~states that we can effectively decode program numbers, and equivalence with the enumeration theorem is natural since universal programs decode. Conversely, (A2)~states that we can effectively encode programs as numbers, and equivalence with the \smn\ theorem is natural since the proof of the \smn\ theorem involves program hacking and encoding.
+
+The exercise and its proof clearly showcase the inverse relationship between the enumeration and \smn\ theorems.
+\end{rmk}
+
+\begin{exer}[2-11]
+Fix a recursive bijection $g:\N\times\N\to\N$. Define $\pi:\N\to\P$ by
+$$\pi(y)=\lambda x
+\begin{cases}
+\begin{cases}
+\text{divergent}&\text{if }x_1=0\\
+x_1-1&\text{if }x_1\ne0
+\end{cases}&\text{if }x=0\\
+\varphi_{x_2}(y)&\text{if }x\ne0
+\end{cases}$$
+where $y=g(x_1,x_2)$. Then (in the terminology of Exercise 2-10):
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $\pi$~is a numbering.
+\item[(b)] (A1)~holds for~$\pi$ but (A2)~does not hold for~$\pi$.
+\end{enumerate}
+\end{exer}
+\begin{proof}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Given $\psi\in\P$, write $\psi=\varphi_{x_2}$. If $\psi(0)$~is divergent, set $x_1=0$, otherwise set $x_1=\psi(0)+1$. By construction $\pi(g(x_1,x_2))=\psi$. Thus $\pi$~is surjective.
+
+\item[(b)] To see that (A1)~holds, note a program code for~$\pi(y)$ can be effectively obtained from~$y$ by the following procedure:
+\begin{enumerate}[itemsep=0pt,label=\arabic{*}.]
+\item Find $x_1,x_2$ with $g(x_1,x_2)=y$ (by recursiveness and surjectivity of~$g$).
+\item Decode~$x_2$ to obtain the program~$P_{x_2}$.
+\item Hack~$P_{x_2}$ to do special processing on input $x=0$: make it diverge (enter an infinite loop) if $x_1=0$, and make it return $x_1-1$ otherwise.
+\item Encode the hacked program.
+\end{enumerate}
+
+To see that (A2)~does not hold, suppose $h$~is a witness. Then the following procedure decides for any~$k$ whether $\varphi_k(0)$~converges---a contradiction:
+\begin{enumerate}[itemsep=0pt,label=\arabic{*}.]
+\item Compute $y=h(k)$.
+\item Find $x_1,x_2$ with $g(x_1,x_2)=y$.
+\item Examine~$x_1$. If $x_1=0$, $\varphi_k(0)$~diverges, otherwise $\varphi_k(0)$~converges.\qedhere
+\end{enumerate}
+\end{enumerate}
+\end{proof}
+\begin{rmk}
+Intuitively, the numbering in this exercise is incomplete (for algorithms) because it encodes too much information about a function in its number (namely, whether or not the function converges on input~$0$).
+\end{rmk}
+
+\begin{exer}[2-12]
+If $f$~is recursive, there exists~$g$ recursive with $f=\lambda x[\mu y[g(x,y)=1]]$.
+\end{exer}
+\begin{proof}
+By Church's Thesis, since $f$~is total,
+$$g(x,y)=
+\begin{cases}
+1&\text{if }f(x)=y\\
+0&\text{otherwise}
+\end{cases}$$
+is recursive, and clearly satisfies the desired property.
+\end{proof}
+
+\begin{exer}[2-13]
+There is a partial recursive function~$\psi$ such that $\lambda x[\mu y[\psi(x,y)=1]]$ is not partial recursive.
+\end{exer}
+\begin{proof}
+Define
+$$\psi(x,y)=
+\begin{cases}
+1&\text{if }y>x\text{ and }y\in K\\
+\text{divergent}&\text{otherwise}
+\end{cases}$$
+Suppose the induced $\mu$~function is partial recursive. Let $t_0$~be the least index of a recursive function and define
+\begin{align*}
+t(0)&=t_0\\
+t(x+1)&=\mu y[\psi(t(x),y)=1]\\
+	&=\mu y>t(x)[y\in K]
+\end{align*}
+Then $t$~is partial recursive. In fact, since there are infinitely many indices of recursive functions, $t$~is total, and the range of~$t$ includes all such indices. Now define
+$$f=\lambda x[\varphi_{t(x)}(t(x))+1]$$
+Then by construction of~$t$, $f$~is recursive but $f$~differs from every recursive function---a contradiction.
+\end{proof}
+
+\begin{rmk}
+This exercise shows that the class of partial recursive functions is not closed under application of~$\mu$. This is a consequence of our simple definition of~$\mu$. In some contexts, $\mu$~is defined such that closure holds (see~\cite{cutland80}, p.~43).
+\end{rmk}
+
+\begin{exer}[2-15]
+There is a recursive function~$f$ such that for all primitive recursive functions~$g$, $f(x)>g(x)$ for all but finitely many~$x$.
+\end{exer}
+\begin{proof}
+Let~$f$ do the following on input~$x$:
+\begin{enumerate}[itemsep=0pt]
+\item Generate the first $x+1$ primitive recursive function derivations, letting $g_0,\ldots,g_x$ denote the functions derived.
+\item Calculate successively $g_0(x),\ldots,g_x(x)$.
+\item Return $1+\sum_{i=0}^x g_i(x)$.
+\end{enumerate}
+By Church's Thesis, $f$~is recursive. If $g$~is primitive recursive, then $g=g_x$ for some~$x$, so by construction $f(y)>g(y)$ for all $y\ge x$.
+\end{proof}
+
+\begin{rmk}
+In this proof, the input parameter~$x$ is used to facilitate varying over the indices of infinitely many functions. In turn, a property is ensured to hold for any given such function almost everywhere (namely, for inputs greater than an index). This technique is reusable and appears often.
+\end{rmk}
+
+\begin{exer}[2-19]
+There is a partial recursive~$\psi$ such that $\ran(\psi)$~is not decidable.
+\end{exer}
+\begin{proof}
+Define
+$$\psi(x)=\begin{cases}
+x&\text{if }x\in K\\
+\text{divergent}&\text{otherwise}
+\end{cases}$$
+By Church's Thesis, $\psi$~is partial recursive, but $\ran(\psi)=K$ is undecidable.
+\end{proof}
+
+\begin{exer}[2-23]
+The halting problem reduces to the problem of deciding whether $\varphi_x$~is total.
+\end{exer}
+\begin{proof}
+By the \smn\ theorem, there is recursive~$s$ such that for all~$x$,
+$$\varphi_{s(x)}=\lambda y\begin{cases}
+1&\text{if }x\in K\\
+\text{divergent}&\text{otherwise}
+\end{cases}$$
+Then $x\in K$ iff $\varphi_{s(x)}$~is total.
+\end{proof}
+
+\begin{exer}[2-26]
+None of the following are reducible to the halting problem:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Deciding whether $\varphi_x$~is constant.
+\item[(b)] Deciding whether $\varphi_x=\varphi_y$.
+\item[(c)] Deciding whether $\varphi_x$~has infinite range.
+\end{enumerate}
+\end{exer}
+\begin{proof}
+First note $\comp{K}$~is not reducible to~$K$, lest $K$~is decidable. The results now follow by observing that $\comp{K}$~is reducible to each of the problems:
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] By Church's Thesis and the \smn\ theorem, choose recursive~$s$ such that
+$$\varphi_{s(x)}=\lambda y\begin{cases}
+0&\text{if }P_x(x)\text{ converges in exactly }y\text{ steps}\\
+1&\text{otherwise}
+\end{cases}$$
+Then $x\in\comp{K}$ iff $\varphi_{s(x)}$~is constant.
+\item[(b)] It is sufficient to prove the result for fixed~$y$, so let~$y$ index the function $\lambda x[1]$. Then the result follows from~(a) since $x\in\comp{K}\iff\varphi_{s(x)}=\lambda x[1]$.
+\item[(c)] Choose recursive~$s$ such that
+$$\varphi_{s(x)}=\lambda y\begin{cases}
+0&\text{if }P_x(x)\text{ converges in at most }y\text{ steps}\\
+y&\text{otherwise}
+\end{cases}$$
+Then $x\in\comp{K}$ iff $\varphi_{s(x)}$~has infinite range.\qedhere
+\end{enumerate}
+\end{proof}
+
+\begin{exer}[2-27]
+If there are recursive functions $f$~and~$g$ with $\ran(f)=A$ and $\ran(g)=\comp{A}$, then $A$~is decidable.
+\end{exer}
+\begin{proof}
+Decide $x\in A$ by enumerating $f(0),g(0),f(1),g(1),\ldots$ until $x$~is found.
+\end{proof}
+
+\begin{exer}[2-29]
+The set $\{\,x\mid\ran(\varphi_x)\text{ is decidable}\,\}$ is undecidable.
+\end{exer}
+\begin{proof}
+By reduction. Choose recursive~$s$ by the \smn\ theorem such that
+$$\varphi_{s(x)}=\lambda y\begin{cases}
+\begin{cases}
+y&\text{if }y\in K\\
+\text{divergent}&\text{if }y\not\in K
+\end{cases}&\text{if }x\in K\\
+\text{divergent}&\text{if }x\not\in K
+\end{cases}$$
+If $x\not\in K$, then $\ran(\varphi_{s(x)})=\emptyset$ is trivially decidable. If $x\in K$, then $\ran(\varphi_{s(x)})=K$ is undecidable. So $x\not\in K$ iff $\ran(\varphi_{s(x)})$ is decidable. The result follows.
+\end{proof}
+
+\begin{exer}[2-30]
+Let $A,B$ be disjoint sets with $A=\dom(\varphi)$ and $B=\dom(\psi)$.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] There is a partial recursive function~$\chi$ with $\chi(A)=\{0\}$ and $\chi(B)=\{1\}$.
+\item[(b)] There is not necessarily a recursive function~$f$ with $f(A)=\{0\}$ and $f(B)=\{1\}$.
+\end{enumerate}
+\end{exer}
+\begin{proof}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] By Church's Thesis. Have $\chi(x)$~run computations for $\varphi(x)$~and~$\psi(x)$ simultaneously and return~$0$ if $\varphi(x)$~converges or~$1$ if $\psi(x)$~converges (or diverge otherwise).
+\item[(b)] Consider
+$$A=K_1=\{\,x\mid\varphi_x(x)=1\,\}\quad\text{and}\quad B=K_0=\{\,x\mid\varphi_x(x)=0\,\}$$
+Clearly $A$~and~$B$ are disjoint and by Church's Thesis each is the domain of a partial recursive function. Suppose $f$~is recursive with $f(A)=\{0\}$ and $f(B)=\{1\}$. Assume without loss of generality that $\ran(f)\subseteq\{0,1\}$ (otherwise apply the signal function). Then $f=\varphi_k$ for some~$k$, and $f(k)\in\{0,1\}$. But
+$$f(k)=0\iff\varphi_k(k)=0\iff k\in K_0\iff f(k)=1\iff f(k)\ne0$$
+---a contradiction.\qedhere
+\end{enumerate}
+\end{proof}
+
+\begin{exer}[2-31]
+The function $\lambda x[\mu y[\varphi_x(y)\text{ diverges}]]$ is not partial recursive.
+\end{exer}
+\begin{proof}
+Choose recursive~$s$ by the \smn\ theorem such that
+$$\varphi_{s(x)}=\lambda y\begin{cases}
+0&\text{if }y<x\\
+\varphi_x(x)&\text{if }y=x\\
+\text{divergent}&\text{if }y>x
+\end{cases}$$
+If the given function is partial recursive, then
+$$f=\lambda x[\mu y[\varphi_{s(x)}(y)\text{ diverges}]]$$
+is recursive. But $x\in K$ iff $x\ne f(x)$, so $K$~is decidable---a contradiction.
+\end{proof}
+
+\begin{exer}[2-33]
+The set $\{\,x\mid\varphi_x\text{ is extendable to a recursive function}\,\}$ is undecidable.
+\end{exer}
+\begin{proof}
+By reduction. Choose recursive~$s$ by the \smn\ theorem such that
+$$\varphi_{s(x)}=\lambda y\begin{cases}
+\varphi_y(y)+1&\text{if }x\in K\\
+\text{divergent}&\text{if }x\not\in K
+\end{cases}$$
+If $x\not\in K$, then $\varphi_{s(x)}$~is trivially extendable. If $x\in K$, then $\varphi_{s(x)}$~is not extendable by the proof of Theorem~2-II. Thus $x\not\in K$ iff $\varphi_{s(x)}$~is extendable, and the result follows.
+\end{proof}
+
+\begin{exer}[2-34]
+Say $B$~is decidable relative to~$A$ if there is a partial recursive~$\varphi$ such that for $x\in A$, $\varphi(x)=1$ if $x\in B$ and $\varphi(x)=0$ if $x\not\in B$.
+
+Set $T=\{\,x\mid\varphi_x\text{ is total (i.e., recursive)}\,\}$.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $\{\,x\mid\varphi_x\text{ is constant}\,\}$ is not decidable relative to~$T$.
+\item[(b)] $\{\,x\mid\varphi_x\text{ is injective}\,\}$ is not decidable relative to~$T$.
+\item[(c)] $\{\,x\mid\varphi_x(y)=z\,\}$, for $y,z$ fixed, is decidable relative to~$T$.
+\item[(d)] $\{\,x\mid\ran(\varphi_x)\text{ is infinite}\,\}$ is not decidable relative to~$T$.
+\end{enumerate}
+\end{exer}
+\begin{proof}
+For undecidability cases, reduce the halting problem within~$T$.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] By the reduction in Exercise 2-26(a), noting that $\varphi_{s(x)}$~is total for all~$x$.
+\item[(b)] By the reduction in Exercise 2-26(c), noting that $\varphi_{s(x)}$~is total for all~$x$.
+\item[(c)] Immediate by Church's Thesis.
+\item[(d)] By the proof of~(b).\qedhere
+\end{enumerate}
+\end{proof}
+
+\begin{exer}[2-39 (Rice)]
+Let $\C$~be a subset of the unary partial recursive functions. Then $C=\{\,x\mid\varphi_x\in\C\,\}$ is undecidable iff $\C$~is nontrivial and proper.
+\end{exer}
+\begin{proof}
+The forward direction is trivial.
+
+For the reverse, reduce~$K$ to~$C$. Assume without loss of generality that the empty function~$\varphi_{\emptyset}$ is not in~$\C$ (otherwise use the complement), and fix $\varphi\in\C$. Now by the \smn\ theorem choose recursive~$s$ such that
+$$\varphi_{s(x)}=\lambda y\begin{cases}
+\varphi(y)&\text{if }x\in K\\
+\text{divergent}&\text{otherwise}
+\end{cases}$$
+If $x\in K$, then $\varphi_{s(x)}=\varphi\in\C$, so $s(x)\in C$. If $x\not\in K$, then $\varphi_{s(x)}=\varphi_{\emptyset}\not\in\C$, so $s(x)\not\in C$. Thus $x\in K$ iff $s(x)\in C$, and the result follows.
+\end{proof}
+
+\newpage
+\section*{Chapter~4}
+
+\subsection*{Exercises}
+\begin{exer}[4-1]
+Let $X$~be a set, $G$~a group of transformations on~$X$ (that is, a group of surjective functions on~$X$ under composition), and $e$~the identity in~$G$.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] $e$~is the identity map on~$X$.
+\item[(b)] If $g\in G$, $g^{-1}\in G$ is a two-sided inverse map of~$g$. In particular, $G$~consists of permutations of~$X$.
+\item[(c)] $G$-isomorphism is an equivalence relation among subsets of~$X$.
+\end{enumerate}
+\end{exer}
+\begin{proof}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Since $ee=e$ in~$G$, $e(e(x))=e(x)$ for all $x\in X$. If $y\in X$, choose $x\in X$ with $e(x)=y$ by surjectivity. Then $e(y)=y$. So $e$~is the identity map.
+
+\item[(b)] Since $g^{-1}g=e=gg^{-1}$ in~$G$, this follows from~(a).
+
+\item[(c)] Let $A,B,C\subseteq X$.
+\begin{description}[itemsep=0pt]
+\item[Reflexivity] By~(a), $A\iso A$ since $e[A]=A$.
+\item[Symmetry] By~(b), if $A\iso B$ then $B\iso A$ since if $g[A]=B$ then $g^{-1}[B]=A$.
+\item[Transitivity] If $A\iso B$ and $B\iso C$ then $A\iso C$ since if $g[A]=B$ and $h[B]=C$ then $hg[A]=h[g[A]]=h[B]=C$.\qedhere
+\end{description}
+\end{enumerate}
+\end{proof}
+
+\begin{exer}[4-2]
+There exist nonrecursive permutations.
+\end{exer}
+\begin{proof}
+Since $K$~and~$\comp{K}$ are both infinite, there exists a permutation~$\pi$ mapping evens to~$K$ and odds to~$\comp{K}$. Clearly $\pi$~is not recursive, lest $K$~is decidable.
+\end{proof}
+
+\begin{exer}[4-3]
+If $\psi$~is injective and partial recursive, then $\psi^{-1}$~is partial recursive.
+\end{exer}
+\begin{proof}
+By Church's Thesis. Given~$y$, run the first~$n$ steps of computations $\psi(0),\ldots,\psi(n)$ for $n=0,1,\ldots$. If a computation halts on input~$x$ with output~$y$, then $\psi^{-1}(y)=x$.
+\end{proof}
+
+\begin{exer}[4-5]
+The set $\{\,x\mid\varphi_x\text{ is a recursive permutation}\,\}$ is undecidable.
+\end{exer}
+\begin{proof}
+By the \smn\ theorem, choose recursive~$s$ such that
+$$\varphi_{s(x)}=\lambda y\begin{cases}
+y&\text{if }\varphi_x(y)\text{ is convergent}\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Then $\varphi_x$~is recursive iff $\varphi_{s(x)}$~is the identity map, a recursive permutation. Hence undecidability follows from undecidability of recursiveness (Theorem 1-VIII).
+\end{proof}
+
+\begin{exer}[4-6]
+\ 
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] There does not exist an effective enumeration of (G\"odel numbers of) all the recursive permutations.
+\item[(b)] The group of recursive permutations is not finitely generated.
+\end{enumerate}
+\end{exer}
+\begin{proof}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] By diagonalization. Suppose there is such an effective enumeration $\pi_0,\pi_1,\pi_2\ldots$. Assume without loss of generality that there do not exist $k,y$ such that for all $x\ge k$, $\pi_x(x)=y$. (If this is not the case, swap pairs of permutations arbitrarily far out to obtain an effective enumeration with this property.)
+
+Now construct~$\pi$ recursively as follows:
+\begin{align*}
+\pi(0)&=\mu y[y\ne\pi_0(0)]\\
+\pi(x+1)&=\mu y[y\ne\pi_{x+1}(x+1),\pi(0),\ldots,\pi(x)]
+\end{align*}
+Clearly $\pi$~is recursive and injective. Claim that $\pi$~is surjective. Indeed, if not, let $y$~be least with $y\not\in\ran(\pi)$. Then there is least~$k$ such that
+$$\{0,\ldots,y-1\}\subseteq\pi[\{0,\ldots,k\}]$$
+By assumption, there is least $x>k$ such that $\pi_x(x)\ne y$. But then $\pi(x)=y$ by construction, so $\pi$~is surjective after all.
+
+Now $\pi$~is a recursive permutation, but $\pi\ne\pi_k$ for all~$k$---a contradiction.
+
+\item[(b)] If it is, we can effectively enumerate finite sequences of (G\"odel numbers of) recursive permutations such that any recursive permutation is the composite over one of the sequences. But then we can effectively enumerate all recursive permutations (by Theorem 1-VI), contradicting~(a).
+\end{enumerate}
+\end{proof}
+
+\begin{exer}[4-10]
+Recursive invariance of properties of sets:
+\begin{center}
+\begin{tabular}{|rl|c|}
+\hline
+&\textbf{Property}&\textbf{Invariant}\\
+\hline
+(i)&Is empty&Yes\\
+(ii)&Is range of recursive function&Yes\\
+(iii)&Is domain of partial recursive function&Yes\\
+(iv)&Possesses recursive characteristic function&Yes\\
+(v)&Is infinite&Yes\\
+(vi)&Contains the even integers&No\\
+(vii)&Contains a set isomorphic to the even integers&Yes\\
+\hline
+\end{tabular}
+\end{center}
+\end{exer}
+\begin{proof}
+For (i)~and~(v), use cardinality.
+
+For (ii)--(iv) and~(vii), look at composites.
+
+For~(vi), consider the recursive permutation
+$$\pi=(01)(23)\cdots(2k\ 2k+1)\cdots$$
+Then for~$E$ the set of even integers, $\pi[E]$~is the set of odd integers.
+\end{proof}
+
+\begin{exer}[4-12]
+Recursive invariance of properties of partial functions:
+\begin{center}
+\begin{tabular}{|rl|c|}
+\hline
+&\textbf{Property}&\textbf{Invariant}\\
+\hline
+(i)&Has infinite domain&Yes\\
+(ii)&Has domain containing range&Yes\\
+(iii)&Is recursive&Yes\\
+(iv)&Is partial recursive&Yes\\
+(v)&Has domain containing the even integers&No\\
+(vi)&Has domain containing a set isomorphic to the even integers&Yes\\
+(vii)&Has domain with seven members&Yes\\
+\hline
+\end{tabular}
+\end{center}
+\end{exer}
+\begin{proof}
+For (i)~and~(vii), use cardinality.
+
+For (ii)--(iv) and~(vi), use Theorem~II.
+
+For~(v), consider $\pi$~from Exercise 4-10 and
+$$\varphi=\lambda x\begin{cases}
+0&\text{if }x\text{ is even}\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Set $\psi=\pi^{-1}\varphi\pi$. Then by Theorem~II, $\varphi\iso\psi$, but $\dom(\varphi)$~is the set of even integers while $\dom(\psi)$~is the set of odd integers.
+\end{proof}
+
+\begin{exer}[4-14]
+The recursive permutations do not form a single isomorphism type.
+\end{exer}
+\begin{proof}
+Consider $\pi=(01)$ and $\rho=(012)$. Every conjugate of~$\pi$ is a transposition, and hence not equal to~$\rho$, so $\pi$~and~$\rho$ are not isomorphic by Theorem~II.
+\end{proof}
+\begin{rmk}
+The property of being a recursive permutation is recursively invariant.
+\end{rmk}
+
+\newpage
+\section*{Chapter~5}
+\begin{exer}[5-2]
+An infinite set~$A$ is recursively enumerable iff $A$~is recursively enumerable without repetitions.
+\end{exer}
+\begin{proof}
+\begin{fwd}
+By Corollary~V(d), $A$~is enumerated by an injective partial recursive function whose domain is an initial segment of~$\N$. Since $A$~is infinite, the domain is just~$\N$.
+\end{fwd}
+\begin{bwd}
+Trivial.\qedhere
+\end{bwd}
+\end{proof}
+
+\begin{exer}[5-3]
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] If $A,B$ are recursive and infinite with infinite complements, then $A\iso B$. There are $\aleph_0$~such sets.
+\item[(b)] $\T$~is an isomorphism type of recursive sets iff $\T$~satisfies the following:
+\begin{description}[itemsep=0pt]
+\item[(R1)] $\T$~is a nonempty set of recursive sets.
+\item[(R2)] If $X,Y\in\T$, $\card{X}=\card{Y}$ and $\card{\comp{X}}=\card{\comp{Y}}$.
+\item[(R3)] If $X\in\T$, $Y$~is recursive, and $\card{X}=\card{Y}$ and $\card{\comp{X}}=\card{\comp{Y}}$, then $Y\in\T$.
+\end{description}
+There are $\aleph_0$~recursive isomorphism types.
+\end{enumerate}
+\end{exer}
+\begin{proof}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] The isomorphism follows from~(b).
+
+There are at least~$\aleph_0$ such sets since the sets $k\N$ ($k>1$) are examples, and there are at most~$\aleph_0$ such sets since there are $\aleph_0$~recursive sets.
+\item[(b)]
+First note if $X,Y$ are recursive, $X\iso Y$ iff $\card{X}=\card{Y}$ and $\card{\comp{X}}=\card{\comp{Y}}$. The forward direction is obvious; for the reverse, define $\pi:\N\to\N$ recursively by
+$$\pi=\lambda x\begin{cases}
+\mu y[y\in Y-\{\pi(0),\ldots,\pi(x-1)\}]&\text{if }x\in X\\
+\mu y[y\in\comp{Y}-\{\pi(0),\ldots,\pi(x-1)\}]&\text{if }x\in\comp{X}
+\end{cases}$$
+Clearly $\pi$~is a recursive bijection and $\pi[X]=Y$, so $X\iso Y$.
+
+Now proceed:
+\begin{fwd}
+(R1) is trivial, and (R2)~and~(R3) follow from the above.
+\end{fwd}
+\begin{bwd}
+By~(R1), there is $X\in\T$. Then by (R1)--(R3) and the above, $\T$~is just the isomorphism type of~$X$.
+\end{bwd}
+It is then immediate that there are~$\aleph_0$ recursive isomorphism types, since there are $\aleph_0$~sets satisfying (R1)--(R3).
+\end{enumerate}
+\end{proof}
+
+\begin{exer}[5-6]
+The set of all recursive sets is recursively enumerable. (That is, there exists a recursively enumerable set~$C$ such that $X$~is recursive iff there exists $x\in C$ with $W_x=X$).
+\end{exer}
+\begin{proof}
+By Church's Thesis, the following algorithm yields a recursive function~$r$:
+
+Given input~$x$,
+\begin{enumerate}[itemsep=0pt]
+\item Construct source code for a program which does the following:
+\begin{quote}
+Given input~$n$, using a universal program and running it on inputs $0,1,2\ldots$ successively, search for a sequence $x_0,\ldots,x_n$ with
+\begin{enumerate}[itemsep=0pt]
+\item[(i)] $x_0=0$ and $\varphi_x(x_0)$~convergent
+\item[(ii)] $x_{i+1}=\mu y[y>x_i\text{ and }\varphi_x(y)\text{ convergent}]$ for $0\le i<n$
+\item[(iii)] $\varphi_x(x_i)\le\varphi_x(x_{i+1})$ for $0\le i<n$
+\end{enumerate}
+If and when~$x_n$ is found, return~$\varphi_x(x_n)$ (otherwise never return).
+\end{quote}
+\item Translate the source code so constructed from range instructions to domain instructions (Corollary~V(b)).
+\item Encode the domain instructions and return the code.
+\end{enumerate}
+Claim $r$~enumerates indices of the recursive sets.
+
+Indeed, $r$~enumerates only indices of recursive sets, for if~$\varphi_x$ is not recursive, or does not recursively enumerate a set in nondecreasing order, then by construction $W_{r(x)}$~is finite and hence recursive. Conversely, if $\varphi_x$~recursively enumerates a set in nondecreasing order, then by construction $W_{r(x)}=\ran(\varphi_x)$, which is recursive by Theorem~III. Moreover, if $X$~is recursive, then by Theorem~III again $X$~is recursively enumerated in nondecreasing order, say by~$\varphi_x$, so $W_{r(x)}=X$.
+\end{proof}
+
+\begin{exer}[5-8]
+There exists an infinite set with no infinite recursively enumerable subset.
+\end{exer}
+\begin{proof}
+There are~$\aleph_0$ infinite recursively enumerable sets, say $A_0,A_1,\ldots$. Define a function $f$~as follows:
+\begin{align*}
+f(0)&=\mu y[y\in A_0]\\
+f(x+1)&=\mu y[y>f(x)+1\text{ and} y\in A_{x+1}]
+\end{align*}
+Then $f$~is well-defined and increasing since each~$A_x$ is infinite.
+
+Set $B=\comp{f[\N]}$. Then $B$~is infinite since $f(x)+1\in B$ for all $x$. But for all~$x$, $A_x\not\subseteq B$ since $f(x)\in A_x-B$.
+\end{proof}
+
+\begin{exer}[5-9]
+Recursiveness and recursive enumerability of sets:
+\begin{center}
+\begin{tabular}{|rl|c|c|c|}
+\hline
+&\textbf{Set}&\textbf{(a) recursive}&\textbf{(b) r.e.}&\textbf{(c) r.e. complement}\\
+\hline
+(i)&$\{\,x\mid x\text{ prime}\,\}$&Y&Y&Y\\
+(ii)&$\{\,x\mid\exists\text{ run of }\ge x\text{ }7\text{'s in }\pi\,\}$&Y&Y&Y\\
+(iii)&$\{\,x\mid\exists\text{ run of }=x\text{ }7\text{'s in }\pi\,\}$&&Y&\\
+(iv)&$\{\,x\mid W_x=\emptyset\,\}$&N&N&Y\\
+(v)&$\{\,x\mid W_x\text{ infinite}\,\}$&N&N&N\\
+(vi)&$\{\,x\mid\varphi_x\text{ total}\,\}$&N&N&N\\
+(vii)&$\{\,x\mid W_x=W_n\,\}$ ($W_n\ne\emptyset$)&N&N&N\\
+(viii)&$\{\,x\mid W_x\text{ recursive}\,\}$&N&N&N\\
+\hline
+\end{tabular}
+\end{center}
+\end{exer}
+\begin{proof}
+For~(i), use Church's Thesis.
+
+For (ii)~and~(iii), use results of~\S1.3.
+
+For~(iv), for~(b) use reduction of~$\comp{K}$ and for~(c) use projection.
+
+For~(v), use reduction of the total functions (see~(vi)). By the \smn\ theorem, choose recursive~$s$ with
+$$\varphi_{s(x)}=\lambda y\bigl[\sum_{i=0}^y\varphi_x(i)\bigr]$$
+Then $\varphi_x$~is total iff $W_{s(x)}$~is infinite.
+
+For~(vi), for~(b) use Exercise~2-9 and for~(c) use reduction of~$\comp{K}$.
+
+For~(vii), use reduction of~$\comp{K}$. For~(b), if $W_n$~is finite, choose recursive~$t$ with
+$$\varphi_{t(x)}=\lambda y\begin{cases}
+\varphi_n(y)&\text{if }P_x(x)\text{ does not converge in }\le y\text{ steps}\\
+0&\text{otherwise}
+\end{cases}$$
+If $x\not\in K$ then $W_{t(x)}=W_n$, and if $x\in K$ then $W_{t(x)}$~is infinite so $W_{t(x)}\ne W_n$. If $W_n$~is infinite, do a similar reduction with
+$$\varphi_{u(x)}=\lambda y\begin{cases}
+\varphi_n(y)&\text{if }P_x(x)\text{ does not converge in }\le y\text{ steps}\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+
+For~(viii), use reduction of~$\comp{K}$. For~(c), choose recursive~$v$ with
+$$\varphi_{v(x)}=\lambda y\begin{cases}
+\varphi_y(y)&\text{if }P_x(x)\text{ does not converge in }\le y\text{ steps}\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+If $x\not\in K$ then $W_{v(x)}=K$ is not recursive, and if $x\in K$ then $W_{v(x)}$~is finite so recursive.
+\end{proof}
+
+\begin{exer}[5-12]
+There are $\aleph_0$~sets recursively enumerable but not recursive.
+\end{exer}
+\begin{proof}
+There are at least~$\aleph_0$ since the sets
+$$n+K=\{\,n+x\mid x\in K\,\}\qquad(n\ge0)$$
+are examples. There are at most~$\aleph_0$ since there are $\aleph_0$ recursively enumerable sets.
+\end{proof}
+
+\begin{exer}[5-15]
+Let $\pi:\N\times\N\to\N$ be a recursive injection, and define
+$$\psi_z=\lambda xy[\varphi_z(\pi(x,y))]$$
+As $z$~varies, $\psi_z$~varies over all binary partial recursive functions.
+\end{exer}
+\begin{proof}
+Each~$\psi_z$ is clearly partial recursive.
+
+Given~$\psi(x,y)$ partial recursive, let $\pi_1,\pi_2$ be recursive with $\pi(\pi_1(u),\pi_2(u))=u$ for all~$u$ and consider
+$$\varphi=\lambda u[\psi(\pi_1(u),\pi_2(u))]$$
+Then $\varphi$~is partial recursive, so $\varphi=\varphi_z$ for some~$z$ and
+\begin{align*}
+\psi_z&=\lambda xy[\varphi_z(\pi(x,y))]\\
+	&=\lambda xy[\psi(\pi_1(\pi(x,y)),\pi_2(\pi(x,y)))]\\
+	&=\lambda xy[\psi(x,y)]
+\end{align*}
+So $\psi_z=\psi$.
+\end{proof}
+
+\begin{exer}[5-17]
+Let $f$~be a function and $\psi$~a partial function.
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] The following are equivalent:
+\begin{enumerate}[itemsep=0pt]
+\item[(i)] $f$~is recursive
+\item[(ii)] $f$~as a binary relation is recursive
+\item[(iii)] $f$~as a binary relation is recursively enumerable
+\end{enumerate}
+\item[(b)] $\psi$~is partial recursive iff $\psi$~as a binary relation is recursively enumerable.
+\end{enumerate}
+\end{exer}
+\begin{proof}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] Clearly (i)$\implies$(ii), and (ii)$\implies$(iii) by Theorem~I. Since~$f$ is total, $f$~is recursive iff $f$~is partial recursive, so (iii)$\implies$(i) follows from~(b).
+\item[(b)]
+\begin{fwd}
+Define
+$$\varphi=\lambda xy\begin{cases}
+1&\text{if }\psi(x)=y\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Then $(x,y)\in\psi$ iff $(x,y)\in\dom(\varphi)$, so $\psi$~is recursively enumerable.
+\end{fwd}
+\begin{bwd}
+To compute~$\psi(x)$, search for~$y$ with $(x,y)\in\psi$.\qedhere
+\end{bwd}
+\end{enumerate}
+\end{proof}
+
+\begin{exer}[5-19]
+Let $R,S$ be $k$-ary relations. If $R\iso S$, then $\tau^k[R]\iso\tau^k[S]$.
+\end{exer}
+\begin{proof}
+If $R\iso S$, there is a recursive bijection $g:\N\to\N$ with $g[R]=S$. Let $h:\N\to\N$ to be the `conjugate' of~$g$ by~$\tau^k$, that is,
+$$h=\lambda x\bigl[\tau^k(g(\pi_1^k(x)),\ldots,g(\pi_k^k(x)))\bigr]$$
+Then $h$~is a recursive bijection and $h[\tau^k[R]]=\tau^k[S]$, so $\tau^k[R]\iso\tau^k[S]$.
+\end{proof}
+\begin{rmk}
+This shows that recursively invariant properties of sets can be extended to recursively invariant properties of relations using codings.
+\end{rmk}
+
+\begin{exer}[5-20]
+There exist $k$-ary relations $R,S$ with $R\not\iso S$ and $\tau^k[R]\iso\tau^k[S]$.
+\end{exer}
+\begin{proof}
+Set $R=\{(0,0),(1,0)\}$ and $S=\{(0,0),(0,1)\}$. Then $R\not\iso S$, but $\tau[R]=\{0,2\}$ and $\tau[S]=\{0,1\}$, so $\sigma=(12)$ is a recursive bijection with $\sigma[\tau[R]]=\tau[S]$, so $\tau[R]\iso\tau[S]$.
+\end{proof}
+\begin{rmk}
+This shows that recursively invariant properties of relations may not be recursively invariant properties of their coding sets (cf. Exercise~5-19). The failure is due to the fact that isomorphism between relations is in general stronger than isomorphism between sets, requiring a `uniformity' across coordinates not implied by isomorphism of sets.
+\end{rmk}
+
+\begin{exer}[5-26]
+It is not possible to recursively decide, given~$x$ with $\varphi_x$~total and nondecreasing, whether $\ran(\varphi_x)$~is finite.
+\end{exer}
+\begin{proof}
+By reduction of~$K$. By the \smn\ theorem, choose recursive~$s$ with
+$$\varphi_{s(x)}=\lambda y\begin{cases}
+t&\text{if }P_x(x)\text{ converges in exactly }t\le y\text{ steps}\\
+y&\text{otherwise}
+\end{cases}$$
+Then $x\in K$ iff $\ran(\varphi_{s(x)})$~is finite.
+\end{proof}
+
+\begin{exer}[5-27(a)]
+There is no recursive~$f$ such that for all~$x$, if $W_x$~is a nonempty recursive set, then $\varphi_{f(x)}$~recursively enumerates~$W_x$ either in increasing order, or in increasing order up to a point of constant value.
+\end{exer}
+\begin{proof}
+If so it is possible to recursively find, for any~$x$ where $W_x$~is nonempty and recursive, a characteristic index for~$W_x$, contradicting Exercise~5-29(a).
+\end{proof}
+
+\begin{exer}[5-29]
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] There is no partial recursive~$\psi$ such that for all~$x$, if $W_x$~is finite then $\psi(x)$~is a characteristic index of~$W_x$.
+\item[(b)]
+\begin{enumerate}[itemsep=0pt]
+\item[(i)] There is a class of finite sets which is recursively enumerable but not characteristically enumerable.
+\item[(ii)] There is a class of finite sets which is characteristically enumerable but not canonically enumerable.
+\item[(iii)] The class of recursive sets is not characteristically enumerable.
+\end{enumerate}
+\end{enumerate}
+\end{exer}
+\begin{proof}
+\begin{enumerate}[itemsep=0pt]
+\item[(a)] By the \smn\ theorem, choose recursive~$s$ with
+$$\varphi_{s(x)}=\lambda y\begin{cases}
+\varphi_x(x)&\text{if }y=0\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Then for all~$x$, $W_{s(x)}=\emptyset$ or $W_{s(x)}=\{0\}$. If $\psi$~exists, then $\psi s$~is recursive, and $\varphi_{\psi(s(x))}$~is the characteristic function of~$W_{s(x)}$ for all~$x$. Therefore
+$$f=\lambda x[\varphi_{\psi(s(x))}(0)]$$
+is recursive. But $f$~is the characteristic function of~$K$---a contradiction.
+\item[(b)]
+\begin{enumerate}[itemsep=0pt]
+\item[(i)] For each $n\in\N$, define a coded `initial segment' of~$K$:
+$$K_n=\{\,\pair{x}{0}\mid x\in K\text{ and }x\le n\,\}\union\{\pair{n}{1}\}$$
+Set $\C=\{\,K_n\mid n\in\N\,\}$. Claim $\C$~is as desired.
+
+Indeed, $\C$~is a set of finite sets, and $\C$~is recursively enumerable by the function which, on input~$n$, returns (by an \smn\ function) an index of the following partial function whose domain is~$K_n$:
+$$\lambda z\begin{cases}
+\varphi_x(x)&\text{if }z=\pair{x}{0}\text{ with }x\le n\\
+0&\text{if }z=\pair{n}{1}\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+
+But if $\C$~is characteristically enumerable, $K$~is decidable: given~$x$, go through the list and find a characteristic index for some~$K_n$ with $x\le n$ (by construction, $n$~can be recursively determined from a characteristic index for~$K_n$). Then $x\in K$ iff $\pair{x}{0}\in K_n$.
+
+\item[(ii)] For each $x\in\N$, define
+$$T_x=\begin{cases}
+\{\pair{t}{0},\pair{x}{1}\}&\text{if }P_x(x)\text{ converges in exactly }t\text{ steps}\\
+\{\pair{x}{1}\}&\text{otherwise}
+\end{cases}$$
+Set $\C=\{\,T_x\mid x\in\N\,\}$. Then $\C$~is a set of finite sets and is characteristically enumerable by the function which, on input~$x$, returns an index of the following characteristic function for~$T_x$:
+$$\lambda z\begin{cases}
+1&\text{if }z=\pair{t}{0}\text{ and }P_x(x)\text{ converges in exactly }t\text{ steps}\\
+1&\text{if }z=\pair{x}{1}\\
+0&\text{otherwise}	
+\end{cases}$$
+If $\C$~is canonically enumerable, $K$~is decidable: given~$x$, go through the list and find a canonical index for~$T_x$ ($x$~can be recursively determined from a canonical index for~$T_x$). Calculate the size of~$T_x$ (Theorem~XV(a)). Then $x\in K$ iff $\card{T_x}=2$.
+
+\item[(iii)]
+By diagonalization. If the recursive sets are characteristically enumerable, it is possible to construct a recursive characteristic function for a set which differs from every recursive set---a contradiction.\qedhere
+\end{enumerate}
+\end{enumerate}
+\end{proof}
+\begin{rmk}
+In this exercise, we used pairs to encode `metadata' about sets in those sets.
+\end{rmk}
+
+\begin{exer}[5-32]
+If $f$~is the single-valuizing function (Theorem~XVI), then
+$$\psi_z=\tau^{-1}[W_{f(z)}]$$
+gives an acceptable numbering of the unary partial recursive functions.
+\end{exer}
+\begin{proof}
+To go from numbers to programs: set $\eta=\varphi_{f'(f(x))}$ with $f'$~as in Corollary~V(c), and given~$z$ construct a program which computes~$\psi_z$ as follows:
+\begin{quote}
+Given input~$x$, compute $\eta(0),\eta(1),\ldots$. If and when $k,y$ are found with $\eta(k)=\pair{x}{y}$, return~$y$.
+\end{quote}
+To go from programs to numbers: given~$x_0$, construct an index~$z_0$ for
+$$\lambda x\begin{cases}
+1&\text{if }x=\pair{y}{z}\text{ and }\varphi_{x_0}(y)=z\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Then $W_{z_0}=\tau[\varphi_{x_0}]$. Since $\varphi_{x_0}$~is a partial function, $W_{z_0}$~is already single-valued, so $W_{f(z_0)}=W_{z_0}$ and
+\begin{equation*}
+\psi_{z_0}=\tau^{-1}[W_{f(z_0)}]=\tau^{-1}[W_{z_0}]=\tau^{-1}[\tau[\varphi_{x_0}]]=\varphi_{x_0}\qedhere
+\end{equation*}
+\end{proof}
+
+\newpage
+\section*{Chapter~6}
+\subsection*{Exercises}
+\begin{defn}
+$K_0=\{\,\pair{x}{y}\mid x\in W_y\,\}$.
+\end{defn}
+\begin{defn}
+$A\le_m B$ iff there exists recursive~$f$ such that $x\in A$ iff $f(x)\in B$. $A\iso_m B$ iff $A\le_m B$ and $B\le_m A$.
+\end{defn}
+
+\begin{exer}[6-3]
+$K_0\le_m K$, so $K$~is complete for~$\le_m$ (among r.e. sets).
+\end{exer}
+\begin{proof}
+By the \smn\ theorem choose recursive~$s$ such that
+$$\varphi_{s(z)}=\lambda w\begin{cases}
+1&\text{if }z=\pair{x}{y}\text{ and }P_x(y)\text{ converges}\\
+\text{undefined}&\text{otherwise}
+\end{cases}$$
+Then
+\begin{align*}
+z\in K_0&\implies W_{s(z)}=\N\implies s(z)\in W_{s(z)}\implies s(z)\in K\\
+z\not\in K_0&\implies W_{s(z)}=\emptyset\implies s(z)\not\in W_{s(z)}\implies s(z)\not\in K
+\end{align*}
+Therefore $s$~witnesses $K_0\le_m K$. Since $K_0$~is complete, $K$~is complete.
+\end{proof}
+
+\begin{exer}[6-8]
+A reducibility relation~$\le_r$ is recursively invariant iff $A\iso B$ implies $A\iso_r B$ for all $A,B$.
+\end{exer}
+\begin{proof}
+\begin{fwd}
+If $A\iso B$, then $A\le_r A$ implies $A\le_r B$ and $B\le_r B$ implies $B\le_r A$, so $A\iso_r B$.
+\end{fwd}
+\begin{bwd}
+If $A\iso C$, $B\iso D$, and $A\le_r B$, then $C\le_r A\le_r B\le_r D$, so $C\le_r D$.
+\end{bwd}
+\end{proof}
+
+\begin{thebibliography}{0}
+\bibitem{cutland80} Cutland, N.~J. \emph{Computability: An introduction to recursive function theory.} New York: Cambridge, 1980.
+\bibitem{rogers87} Rogers, H. \emph{Theory of Recursive Functions and Effective Computability.} Cambridge: MIT, 1987.
+\end{thebibliography}
+\end{document}
