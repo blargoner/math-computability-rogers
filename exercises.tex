@@ -60,7 +60,7 @@ Note the following functions are primitive recursive:
 \begin{description}[itemsep=0pt]
 \item[Predecessor (truncated)] $p(x)=\lambda x[\max(0,x-1)]$
 \item[Difference (truncated)] $d(x,y)=\lambda xy[\max(0,x-y)]$
-\item[Signal] $s(x)=\lambda xy[\min(x,1)]$
+\item[Signal] $s(x)=\lambda x[\min(x,1)]$
 \end{description}
 Indeed, note $p(0)=0$ and $p(x+1)=x$; $d(x,0)=x$ and $d(x,y+1)=p(d(x,y))$; and $s(x)=d(x,p(x))$. Now $g(x)=s(d(k+1,x))$ since $x\le k$ iff $0<(k+1)-x$.
 \end{proof}
