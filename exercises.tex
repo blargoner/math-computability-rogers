@@ -117,7 +117,7 @@ $$h(z,x)=
 There is no recursive function~$f$ with $\ran(f)=\{\,x\mid\varphi_x\text{ is total}\,\}$.
 \end{exer}
 \begin{proof}
-If so, set $g=\lambda x[\varphi_{f(x)}(x)+1]$. Then $g$~is recursive, say $g=\varphi_k$, but
+If so, set $g=\lambda x[\varphi_{f(x)}(x)+1]$. Then $g$~is recursive, say $g=\varphi_{f(k)}$, but
 $$g(k)=\varphi_{f(k)}(k)+1=g(k)+1$$
 ---a contradiction.
 \end{proof}
@@ -309,33 +309,6 @@ $$\varphi_{s(x)}=\lambda y\begin{cases}
 \text{divergent}&\text{otherwise}
 \end{cases}$$
 Then $x\in K$ iff $\varphi_{s(x)}$~is total.
-\end{proof}
-
-\begin{exer}[2-26]
-None of the following are reducible to the halting problem:
-\begin{enumerate}[itemsep=0pt]
-\item[(a)] Deciding whether $\varphi_x$~is constant.
-\item[(b)] Deciding whether $\varphi_x=\varphi_y$.
-\item[(c)] Deciding whether $\varphi_x$~has infinite range.
-\end{enumerate}
-\end{exer}
-\begin{proof}
-First note $\comp{K}$~is not reducible to~$K$, lest $K$~is decidable. The results now follow by observing that $\comp{K}$~is reducible to each of the problems:
-\begin{enumerate}[itemsep=0pt]
-\item[(a)] By Church's Thesis and the \smn\ theorem, choose recursive~$s$ such that
-$$\varphi_{s(x)}=\lambda y\begin{cases}
-0&\text{if }P_x(x)\text{ converges in exactly }y\text{ steps}\\
-1&\text{otherwise}
-\end{cases}$$
-Then $x\in\comp{K}$ iff $\varphi_{s(x)}$~is constant.
-\item[(b)] It is sufficient to prove the result for fixed~$y$, so let~$y$ index the function $\lambda x[1]$. Then the result follows from~(a) since $x\in\comp{K}\iff\varphi_{s(x)}=\lambda x[1]$.
-\item[(c)] Choose recursive~$s$ such that
-$$\varphi_{s(x)}=\lambda y\begin{cases}
-0&\text{if }P_x(x)\text{ converges in at most }y\text{ steps}\\
-y&\text{otherwise}
-\end{cases}$$
-Then $x\in\comp{K}$ iff $\varphi_{s(x)}$~has infinite range.\qedhere
-\end{enumerate}
 \end{proof}
 
 \begin{exer}[2-27]
